@@ -1,0 +1,89 @@
+# File: .github/workflows/etl.yml
+
+name: AZKO DWH — ETL Pipeline Harian
+
+on:
+  # ── Jadwal otomatis: tiap hari jam 08.00 WIB (01.00 UTC) ──
+  schedule:
+    - cron: "0 1 * * *"
+
+  # ── Bisa dijalankan manual dari tab Actions ──
+  workflow_dispatch:
+    inputs:
+      generate_new_data:
+        description: "Generate data dummy baru dulu? (true/false)"
+        required: false
+        default: "false"
+
+jobs:
+  etl:
+    name: Run ETL Pipeline
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      # 1. Checkout kode
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Python
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 4. (Opsional) Generate data dummy baru
+      - name: Generate dummy data
+        if: github.event.inputs.generate_new_data == 'true' || github.event_name == 'schedule'
+        run: python src/generate_data.py
+        env:
+          SALES_DB_HOST:      ${{ secrets.SALES_DB_HOST }}
+          SALES_DB_PORT:      ${{ secrets.SALES_DB_PORT }}
+          SALES_DB_USER:      ${{ secrets.SALES_DB_USER }}
+          SALES_DB_PASS:      ${{ secrets.SALES_DB_PASS }}
+          SALES_DB_NAME:      ${{ secrets.SALES_DB_NAME }}
+          WAREHOUSE_DB_HOST:  ${{ secrets.WAREHOUSE_DB_HOST }}
+          WAREHOUSE_DB_PORT:  ${{ secrets.WAREHOUSE_DB_PORT }}
+          WAREHOUSE_DB_USER:  ${{ secrets.WAREHOUSE_DB_USER }}
+          WAREHOUSE_DB_PASS:  ${{ secrets.WAREHOUSE_DB_PASS }}
+          WAREHOUSE_DB_NAME:  ${{ secrets.WAREHOUSE_DB_NAME }}
+          MARKETING_DB_HOST:  ${{ secrets.MARKETING_DB_HOST }}
+          MARKETING_DB_PORT:  ${{ secrets.MARKETING_DB_PORT }}
+          MARKETING_DB_USER:  ${{ secrets.MARKETING_DB_USER }}
+          MARKETING_DB_PASS:  ${{ secrets.MARKETING_DB_PASS }}
+          MARKETING_DB_NAME:  ${{ secrets.MARKETING_DB_NAME }}
+
+      # 5. Jalankan ETL
+      - name: Run ETL pipeline
+        run: python src/etl_pipeline.py
+        env:
+          SALES_DB_HOST:      ${{ secrets.SALES_DB_HOST }}
+          SALES_DB_PORT:      ${{ secrets.SALES_DB_PORT }}
+          SALES_DB_USER:      ${{ secrets.SALES_DB_USER }}
+          SALES_DB_PASS:      ${{ secrets.SALES_DB_PASS }}
+          SALES_DB_NAME:      ${{ secrets.SALES_DB_NAME }}
+          WAREHOUSE_DB_HOST:  ${{ secrets.WAREHOUSE_DB_HOST }}
+          WAREHOUSE_DB_PORT:  ${{ secrets.WAREHOUSE_DB_PORT }}
+          WAREHOUSE_DB_USER:  ${{ secrets.WAREHOUSE_DB_USER }}
+          WAREHOUSE_DB_PASS:  ${{ secrets.WAREHOUSE_DB_PASS }}
+          WAREHOUSE_DB_NAME:  ${{ secrets.WAREHOUSE_DB_NAME }}
+          MARKETING_DB_HOST:  ${{ secrets.MARKETING_DB_HOST }}
+          MARKETING_DB_PORT:  ${{ secrets.MARKETING_DB_PORT }}
+          MARKETING_DB_USER:  ${{ secrets.MARKETING_DB_USER }}
+          MARKETING_DB_PASS:  ${{ secrets.MARKETING_DB_PASS }}
+          MARKETING_DB_NAME:  ${{ secrets.MARKETING_DB_NAME }}
+          DWH_DATABASE_URL:   ${{ secrets.DWH_DATABASE_URL }}
+
+      # 6. Notifikasi status
+      - name: ETL status summary
+        if: always()
+        run: |
+          echo "──────────────────────────────"
+          echo "ETL selesai: $(date '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "Status job: ${{ job.status }}"
+          echo "──────────────────────────────"
