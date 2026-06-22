@@ -126,22 +126,22 @@ Refreshing Materialized Views (OLAP cubes)...
 Materialized Views refresh selesai.
 ```
 
-### Langkah 3 — Jalankan Query OLAP di Neon / Metabase
+### Langkah 3 — Jalankan Query OLAP di Neon / Superset
 
-Semua query di file berikut bisa langsung dijalankan di **Neon SQL Editor** atau sebagai **Metabase Question (Native Query)**:
+Semua query di file berikut bisa langsung dijalankan di **Neon SQL Editor** atau melalui **Superset SQL Lab**:
 
 1. [olap_cube_queries.sql](file:///d:/KULIAH/SEMESTER%206/Data%20Warehouse/azko-warehouse/src/dwh/olap_cube_queries.sql) — ROLLUP, CUBE, GROUPING SETS
 2. [olap_operations.sql](file:///d:/KULIAH/SEMESTER%206/Data%20Warehouse/azko-warehouse/src/dwh/olap_operations.sql) — Drill-Down, Roll-Up, Slice, Dice, Pivot
 3. [historical_analysis.sql](file:///d:/KULIAH/SEMESTER%206/Data%20Warehouse/azko-warehouse/src/dwh/historical_analysis.sql) — Tren, Growth, YTD, Seasonality
 
 > [!NOTE]
-> Untuk Metabase, gunakan **New Question → Native Query** lalu paste query yang diinginkan. Setiap query terpisah menghasilkan 1 card di dashboard.
+> Untuk Superset, gunakan **SQL Lab → SQL Editor** lalu paste query yang diinginkan. Simpan sebagai **Dataset** atau langsung **Explore** menjadi chart. Setiap query terpisah menghasilkan 1 chart di dashboard.
 
-### Langkah 4 — Tambahkan Card Dashboard OLAP di Metabase
+### Langkah 4 — Tambahkan Chart Dashboard OLAP di Superset
 
-Selain 7 card dasar sebelumnya, tambahkan card berikut:
+Selain 7 chart dasar sebelumnya, tambahkan chart berikut:
 
-| # | Card Baru | Query Source | Tipe Visualisasi |
+| # | Chart Baru | Query Source | Tipe Visualisasi |
 |---|---|---|---|
 | 8 | Revenue by Category × Quarter (Pivot) | `olap_operations.sql` query 5A | Table / Heatmap |
 | 9 | Monthly Revenue Trend + Moving Average | `historical_analysis.sql` query 1A | Line Chart (dual axis) |

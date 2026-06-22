@@ -62,7 +62,7 @@ azko-warehouse/
 | **GitHub** | https://github.com | Repo + CI/CD otomatis |
 | **Railway.app** | https://railway.app | MySQL cloud (OLTP) — ⭐ Direkomendasikan |
 | **Neon.tech** | https://neon.tech | PostgreSQL cloud (DWH) |
-| **Metabase** | https://metabase.com/start/oss/ | Dashboard BI |
+| **Apache Superset (Cloud / Preset)** | https://preset.io | Dashboard BI (Superset managed) |
 
 > [!TIP]
 > Railway memberikan $5 kredit gratis per bulan — cukup untuk project ini.
@@ -268,38 +268,42 @@ ETL Selesai! Data Warehouse siap.
 
 ---
 
-### FASE 5 — Setup Metabase (Dashboard BI)
+### FASE 5 — Setup Apache Superset (Cloud)
 
-#### Langkah 5.1 — Pilih Platform Metabase
+#### Langkah 5.1 — Buat Workspace Superset Cloud
 
-**Opsi A — Metabase Cloud (paling mudah):**
-1. Daftar di https://www.metabase.com/start/oss/
-2. Pilih **"Metabase Cloud"** → Free trial 14 hari
-
-**Opsi B — Self-hosted di Railway (gratis permanen):**
-1. Di Railway → **New Project** → pilih template **Metabase**
-2. Deploy → akses via URL Railway
+1. Daftar di https://preset.io (Superset Cloud / Preset)
+2. Buat **Workspace** baru
+3. Masuk ke web app Superset
 
 #### Langkah 5.2 — Connect ke Neon PostgreSQL
 
-1. Login Metabase → **Settings** → **Admin** → **Databases** → **Add Database**
+1. Superset UI → **Settings** (ikon gear) → **Data** → **Databases** → **+ Database**
 2. Pilih **PostgreSQL**
-3. Isi:
+3. Isi SQLAlchemy URI:
    ```
-   Display name : AZKO Data Warehouse
-   Host         : ep-xxx.ap-southeast-1.aws.neon.tech
-   Port         : 5432
-   Database     : neondb
-   Username     : <dari Neon>
-   Password     : <dari Neon>
+   postgresql+psycopg2://user:password@ep-xxx.ap-southeast-1.aws.neon.tech:5432/neondb?sslmode=require
    ```
-4. Klik **Save** → tunggu sync
+4. Klik **Test Connection** → **Save**
+5. Jalankan **Sync Tables** dan **Scan for Metadata**
 
-#### Langkah 5.3 — Buat Dashboard
+#### Langkah 5.3 — Buat Dataset
 
-Buat 7 Questions dan kumpulkan ke 1 Dashboard **"AZKO Analytics"**:
+1. **Data** → **Datasets** → **+ Dataset**
+2. Pilih database **AZKO Data Warehouse**
+3. Tambahkan dataset utama:
+   - `fact_sales`
+   - `mv_monthly_sales`
+   - `mv_category_region`
+   - `mv_customer_segment`
+   - `mv_store_performance`
+   - `mv_promotion_effectiveness`
 
-| # | Card | Tipe | Query |
+#### Langkah 5.4 — Buat Dashboard
+
+Buat 7 chart dan kumpulkan ke 1 dashboard **"AZKO Analytics"**:
+
+| # | Chart | Tipe | Query |
 |---|---|---|---|
 | 1 | Total Revenue 2025 | Big Number | `SUM(final_sales)` |
 | 2 | Trend Penjualan Bulanan | Line Chart | Group by year, month |
@@ -310,7 +314,7 @@ Buat 7 Questions dan kumpulkan ke 1 Dashboard **"AZKO Analytics"**:
 | 7 | Segmentasi Membership | Bar Chart | Join dim_customer |
 
 > [!TIP]
-> Query SQL siap pakai untuk Metabase ada di [analytics_queries.sql](file:///d:/KULIAH/SEMESTER%206/Data%20Warehouse/azko-warehouse/src/dwh/analytics_queries.sql)
+> Query SQL siap pakai untuk Superset ada di [analytics_queries.sql](file:///d:/KULIAH/SEMESTER%206/Data%20Warehouse/azko-warehouse/src/dwh/analytics_queries.sql). Jalankan via **SQL Lab** lalu **Save as Dataset** atau langsung **Explore** jadi chart.
 
 ---
 
@@ -322,7 +326,7 @@ Jalankan query dari [analytics_queries.sql](file:///d:/KULIAH/SEMESTER%206/Data%
 
 #### Langkah 6.2 — Screenshot Dashboard
 
-Ambil screenshot dashboard Metabase untuk laporan.
+Ambil screenshot dashboard Superset untuk laporan.
 
 ---
 
@@ -333,7 +337,7 @@ Ambil screenshot dashboard Metabase untuk laporan.
 | `Connection refused` ke MySQL | Host/port salah | Cek settings Railway, pastikan pakai port yang benar (seringkali bukan 3306) |
 | ETL gagal di GitHub Actions | Secret belum ditambahkan | Cek Settings → Secrets, pastikan nama persis sama |
 | `SSL required` di Neon | Neon wajib SSL | Tambahkan `?sslmode=require` di akhir `DWH_DATABASE_URL` |
-| Data kosong di Metabase | ETL belum berhasil | Trigger manual dari tab Actions, baca log error |
+| Data kosong di Superset | ETL belum berhasil | Trigger manual dari tab Actions, baca log error |
 | `ON CONFLICT DO NOTHING` error | Syntax PostgreSQL | Query ini hanya untuk Neon (PostgreSQL), bukan MySQL |
 
 ---
@@ -341,7 +345,7 @@ Ambil screenshot dashboard Metabase untuk laporan.
 ## ✅ Checklist Pengerjaan
 
 ```
-[ ] Fase 0 — Buat akun GitHub, Railway, Neon, Metabase
+[ ] Fase 0 — Buat akun GitHub, Railway, Neon, Superset Cloud
 [ ] Fase 0 — Push repo ke GitHub
 [ ] Fase 1 — Buat 3 MySQL database di Railway
 [ ] Fase 1 — Jalankan DDL SQL di masing-masing database
@@ -351,8 +355,8 @@ Ambil screenshot dashboard Metabase untuk laporan.
 [ ] Fase 3 — Test lokal: buat .env, install deps, jalankan generate_data & ETL
 [ ] Fase 4 — Masukkan semua secrets ke GitHub Secrets
 [ ] Fase 4 — Trigger manual pertama dari tab Actions
-[ ] Fase 5 — Connect Metabase ke Neon
-[ ] Fase 5 — Buat 7 card dashboard
+[ ] Fase 5 — Connect Superset ke Neon
+[ ] Fase 5 — Buat 7 chart dashboard
 [ ] Fase 6 — Verifikasi query analitik
 [ ] Final — Screenshot dashboard untuk laporan
 ```
