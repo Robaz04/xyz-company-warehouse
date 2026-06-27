@@ -53,7 +53,7 @@ ORDER BY t.year, t.week_of_year;
 
 -- 2A. Month-over-Month Revenue Growth
 SELECT
-    t.year,
+    t.year || '-' || t.month_name AS periode_bulan,
     t.month,
     t.month_name,
     SUM(f.final_sales)                                           AS current_revenue,
@@ -71,7 +71,7 @@ ORDER BY t.year, t.month;
 
 -- 2B. Quarter-over-Quarter Growth
 SELECT
-    t.year,
+    t.year || ' ' || t.quarter AS periode_kuartal,
     t.quarter,
     SUM(f.final_sales)                                           AS current_revenue,
     LAG(SUM(f.final_sales)) OVER (ORDER BY t.year, t.quarter)    AS prev_quarter_revenue,

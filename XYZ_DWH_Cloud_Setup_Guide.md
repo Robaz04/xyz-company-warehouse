@@ -1,4 +1,4 @@
-# 📦 Panduan Lengkap: Cloud Data Warehouse AZKO
+# 📦 Panduan Lengkap: Cloud Data Warehouse XYZ
 ### Untuk AI IDE (GitHub Copilot / Antigravity)
 
 > **Stack:** MySQL (PlanetScale) → Python ETL → PostgreSQL DWH (Neon.tech) → Metabase Cloud  

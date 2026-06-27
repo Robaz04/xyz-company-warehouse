@@ -1,6 +1,6 @@
 -- ═══════════════════════════════════════════════════════
--- AZKO DWH — Query Analitik Siap Pakai
--- Target: Neon.tech PostgreSQL / Metabase
+-- XYZ DWH — Query Analitik
+-- Target: Neon.tech PostgreSQL / Preset
 -- ═══════════════════════════════════════════════════════
 
 -- ── A. Rekap Penjualan Bulanan ────────────────────────────────────────
@@ -42,16 +42,25 @@ ORDER BY total_revenue DESC;
 
 -- ── D. Efektivitas Campaign Promosi ──────────────────────────────────
 SELECT
-    pr.campaign_name, pr.campaign_type, pr.channel,
+    pr.campaign_name,
+    pr.campaign_type,
+    pr.channel,
     COUNT(DISTINCT f.transaction_id) AS pakai_promo,
-    SUM(f.discount_amount)           AS total_diskon,
-    SUM(f.final_sales)               AS revenue_dari_promo,
-    ROUND(SUM(f.final_sales) /
-          NULLIF(SUM(f.discount_amount),0), 2) AS roi_ratio
+    SUM(f.discount_amount) AS total_diskon,
+    SUM(f.final_sales) AS revenue_dari_promo,
+    ROUND(
+        SUM(f.final_sales) /
+        NULLIF(SUM(f.discount_amount),0),
+        2
+    ) AS roi_ratio
 FROM fact_sales f
-JOIN dim_promotion pr ON f.promotion_key = pr.promotion_key
+JOIN dim_promotion pr
+    ON f.promotion_key = pr.promotion_key
 WHERE pr.campaign_id != 'NO_PROMO'
-GROUP BY pr.campaign_name, pr.campaign_type, pr.channel
+GROUP BY
+    pr.campaign_name,
+    pr.campaign_type,
+    pr.channel
 ORDER BY revenue_dari_promo DESC;
 
 -- ── E. Segmentasi Pelanggan ───────────────────────────────────────────
@@ -91,7 +100,8 @@ LIMIT 10;
 
 -- ── H. Penjualan per Kategori per Kuartal ─────────────────────────────
 SELECT
-    t.year, t.quarter, p.category,
+    t.year || ' Q' || t.quarter AS periode, -- Menggabungkan jadi "2025 Q1", "2025 Q2", dst.
+    p.category,
     SUM(f.final_sales)  AS revenue,
     SUM(f.gross_profit) AS profit
 FROM fact_sales f
